@@ -1,7 +1,7 @@
 <?php
 
-use App\View\Smarty\SmartyConfigGeneric;
-use App\View\Smarty\SmartyAdapter;
+use Core\View\Smarty\SmartyConfigGeneric;
+use Core\View\Smarty\SmartyAdapter;
 
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/../vendor/autoload.php';

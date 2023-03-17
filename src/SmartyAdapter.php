@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\View\Smarty;
+namespace Core\View\Smarty;
 
-use App\View\Interfaces\View;
-use App\View\Interfaces\ViewAdapter;
+use Core\View\Interfaces\View;
+use Core\View\Interfaces\ViewAdapter;
 use \Smarty;
 
 class SmartyAdapter implements ViewAdapter

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\View\Smarty;
+namespace Core\View\Smarty;
 
 interface SmartyConfig
 {
