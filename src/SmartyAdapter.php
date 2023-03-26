@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Core\View\Smarty;
 
-use Core\View\Interfaces\View;
-use Core\View\Interfaces\ViewAdapter;
+use Core\Interfaces\View;
+use Core\Interfaces\ViewAdapter;
 use \Smarty;
 
 class SmartyAdapter implements ViewAdapter

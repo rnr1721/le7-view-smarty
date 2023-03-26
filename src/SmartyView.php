@@ -2,7 +2,7 @@
 
 namespace Core\View\Smarty;
 
-use Core\View\Interfaces\View;
+use Core\Interfaces\View;
 use \Smarty;
 use \SmartyException;
 use \Exception;
