@@ -1,6 +1,6 @@
 {
     "name": "rnr1721/le7-view-smarty",
-    "description": "Lightweight PHP framework with API,CLI,WEB controllers - smarty view renderer",
+    "description": "Smarty view adapter for le7 PHP MVC framework or any PHP PSR project",
     "keywords": ["le7", "le7-framework", "framework", "view", "component", "smarty"],
     "authors": [
         {
@@ -15,17 +15,24 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Core\\View\\Smarty\\": "src"
+            "Core\\Interfaces\\": "src/Interfaces",
+            "Core\\View\\Smarty\\": "src/Smarty"
         }
     },
     "require": {
         "php": ">=8.1",
+        "psr/log": "^3.0",
         "rnr1721/le7-view": "^1.0.0",
         "smarty/smarty": "^4.1"
     },
     "require-dev": {
         "vimeo/psalm": "^5.7",
-        "phpunit/phpunit": "^10.0"
+        "phpunit/phpunit": "^10.0",
+        "nyholm/psr7": "^1.5",
+        "nyholm/psr7-server": "^1.0",
+        "rnr1721/le7-cache": "^1.0",
+        "rnr1721/le7-logger": "^1.0",
+        "rnr1721/le7-testing": "^1.0"
     },
     "scripts": {
         "test": [

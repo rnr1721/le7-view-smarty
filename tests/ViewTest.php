@@ -1,7 +1,14 @@
 <?php
 
-use Core\View\Smarty\SmartyConfigGeneric;
 use Core\View\Smarty\SmartyAdapter;
+use Core\Interfaces\SmartyConfig;
+use Core\View\Smarty\SmartyConfigGeneric;
+use Core\Interfaces\ViewTopology;
+use Core\View\ViewTopologyGeneric;
+use Core\Interfaces\ViewAdapter;
+use Core\View\WebPageGeneric;
+use Core\Testing\MegaFactory;
+use Psr\SimpleCache\CacheInterface;
 
 require_once 'vendor/autoload.php';
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -9,11 +16,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
 class ViewTest extends PHPUnit\Framework\TestCase
 {
 
-    private SmartyConfigGeneric $config;
+    private string $compiledDirectory;
+    private string $testsDirectory;
+    private MegaFactory $megaFactory;
 
     protected function setUp(): void
     {
-        $this->config = new SmartyConfigGeneric();
+        $this->testsDirectory = getcwd() . DIRECTORY_SEPARATOR . 'tests';
+        $this->compiledDirectory = $this->testsDirectory . DIRECTORY_SEPARATOR . 'compiled';
+        $this->megaFactory = new MegaFactory($this->testsDirectory);
+        $this->megaFactory->mkdir($this->compiledDirectory);
     }
 
     public function testConfig()
@@ -22,76 +34,104 @@ class ViewTest extends PHPUnit\Framework\TestCase
         $defConfig = [
             'leftDelimiter' => '{',
             'rightDelimiter' => '}',
-            'templateDirs' => [],
-            'cacheDir' => '',
             'compiledDir' => '',
-            'caching' => 0,
             'errorReporting' => E_ALL,
-            'pluginSystemDir' => '',
-            'pluginAppDir' => ''
+            'plugins' => [],
         ];
 
-        $currConfig = $this->config->getConfig();
+        $config = new SmartyConfigGeneric();
 
-        $this->assertEquals($defConfig, $currConfig);
+        $this->assertEquals($defConfig, $config->getConfig());
 
-        $this->config->setCacheDir('.');
-        $this->config->setCaching(3600);
-        $this->config->setCompiledDir('.');
-        $this->config->setDelimiters('[[', ']]');
-        $this->config->setErrorReporting(E_ALL);
-        $this->config->setPluginAppDir('.');
-        $this->config->setPluginSystemDir('.');
-        $this->config->setTemplateDirs(['./dir1', './dir2']);
-        $this->config->setTemplateDirs('./dir3');
+        $config->setCompiledDir('.');
+        $config->setDelimiters('[[', ']]');
+        $config->setErrorReporting(E_ALL);
+        $config->setPluginsDir('.');
+        $config->setPluginsDir('..');
 
-        $this->assertEquals('.', $this->config->getCacheDir());
-        $this->assertEquals(3600, $this->config->getCaching());
-        $this->assertEquals('.', $this->config->getCompiledDir());
-        $this->assertEquals('[[', $this->config->getLeftDelimiter());
-        $this->assertEquals(']]', $this->config->getRightDelimiter());
-        $this->assertEquals(E_ALL, $this->config->getErrorReporting());
-        $this->assertEquals('.', $this->config->getPluginSystemDir());
-        $this->assertEquals('.', $this->config->getPluginAppDir());
-        $this->assertEquals(['./dir1', './dir2', './dir3'], $this->config->getTemplateDirs());
+        $this->assertEquals('.', $config->getCompiledDir());
+        $this->assertEquals('[[', $config->getLeftDelimiter());
+        $this->assertEquals(']]', $config->getRightDelimiter());
+        $this->assertEquals(E_ALL, $config->getErrorReporting());
+        $this->assertEquals(['.', '..'], $config->getPluginsDir());
     }
 
-    public function testView()
+    public function testSmarty()
     {
-
-        $testsDir = getcwd() . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR;
-
-        $templatesDir = $testsDir . 'mock_templates';
-
-        $compiledDir = $testsDir . 'smarty_compiled';
-
-        if (!file_exists($compiledDir)) {
-            mkdir($compiledDir, 0777, true);
-        }
-
-        $this->config->setCompiledDir($compiledDir);
-
-        $this->config->setTemplateDirs($templatesDir);
-
-        $smatyAdapter = new SmartyAdapter($this->config);
-        $view = $smatyAdapter->getView();
-
-        $result = $view->render('testlayout.tpl', ['one' => '17', 'two' => '21']);
-
-        $this->assertEquals('1721', $result);
-        
-        $filesToDelete = glob($compiledDir . DIRECTORY_SEPARATOR . '*.tpl.php');
-        
-        foreach ($filesToDelete as $file) {
-            if (is_file($file)) {
-                unlink($file);
-            }
-        }
-        
-        if (file_exists($compiledDir)) {
-            rmdir($compiledDir);
-        }
-        
+        $adapter = $this->getSmartyAdapter();
+        $view = $adapter->getView();
+        $view->assign('one', 'value1');
+        $view->assign('two', 'value2');
+        $fetched = $view->fetch('testlayout.tpl');
+        $this->assertEquals('value1value2https://example.com/jshttps://example.com/theme', $fetched);
+        $view->clear();
+        $view->assign('one', 'value1_1');
+        $view->assign('two', 'value2_2');
+        $response = $view->render('testlayout.tpl', [], 201);
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals('value1_1value2_2https://example.com/jshttps://example.com/theme', (string) $response->getBody());
     }
-    
+
+    public function testSmartyWriteCache()
+    {
+        $cache = $this->megaFactory->getCache()->getFileCache();
+        $adapter = $this->getSmartyAdapter($cache);
+        $view = $adapter->getView();
+        $view->assign('one', 'value1');
+        $view->assign('two', 'value2');
+        $response = $view->render('testlayout.tpl', [], 200, [], 0);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('value1value2https://example.com/jshttps://example.com/theme', (string) $response->getBody());
+        return $cache;
+    }
+
+    /**
+     * @depends testSmartyWriteCache
+     */
+    public function testSmartyGetCache(CacheInterface $cache)
+    {
+        $adapter = $this->getSmartyAdapter($cache);
+        $view = $adapter->getView();
+        $response = $view->renderFromCache();
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('value1value2https://example.com/jshttps://example.com/theme', (string) $response->getBody());
+    }
+
+    public function getSmartyAdapter(CacheInterface $cache = null): ViewAdapter
+    {
+        if (empty($cache)) {
+            $cache = $this->megaFactory->getCache()->getFileCache();
+        }
+        $logger = $this->megaFactory->getLogger(true, 'test.log');
+
+        $config = $this->getSmartyConfig();
+        $viewTopology = $this->getViewTopology();
+        $webPage = new WebPageGeneric($viewTopology);
+        $request = $this->megaFactory->getServer()->getServerRequest('https://example.com/page/open', 'GET');
+        $response = $this->megaFactory->getServer()->getResponse(200, '');
+
+        return new SmartyAdapter($config, $viewTopology, $webPage, $request, $response, $cache, $logger);
+    }
+
+    public function getViewTopology(): ViewTopology
+    {
+        $viewTopology = new ViewTopologyGeneric();
+        $viewTopology->setBaseUrl('https://example.com')
+                ->setCssUrl('https://example.com/css')
+                ->setFontsUrl('https://example.com/fonts')
+                ->setImagesUrl('https://https://example.com/images')
+                ->setJsUrl('https://example.com/js')
+                ->setLibsUrl('https://example.com/libs')
+                ->setThemeUrl('https://example.com/theme')
+                ->setTemplatePath($this->testsDirectory . DIRECTORY_SEPARATOR . 'mock_templates');
+        return $viewTopology;
+    }
+
+    public function getSmartyConfig(): SmartyConfig
+    {
+        $smartyConfig = new SmartyConfigGeneric();
+        $smartyConfig->setCompiledDir($this->compiledDirectory);
+        return $smartyConfig;
+    }
+
 }
