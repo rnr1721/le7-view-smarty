@@ -12,6 +12,7 @@ use Core\Interfaces\SmartyConfig;
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Log\LoggerInterface;
 use \Smarty;
 
@@ -22,7 +23,7 @@ class SmartyAdapter implements ViewAdapter
     private ViewTopology $viewTopology;
     private WebPage $webPage;
     private ServerRequestInterface $request;
-    private ResponseInterface $response;
+    private ResponseFactoryInterface $responseFactory;
     private CacheInterface $cache;
     private LoggerInterface $logger;
 
@@ -31,7 +32,7 @@ class SmartyAdapter implements ViewAdapter
             ViewTopology $viewTopology,
             WebPage $webPage,
             ServerRequestInterface $request,
-            ResponseInterface $response,
+            ResponseFactoryInterface $responseFactory,
             CacheInterface $cache,
             LoggerInterface $logger
     )
@@ -40,22 +41,32 @@ class SmartyAdapter implements ViewAdapter
         $this->viewTopology = $viewTopology;
         $this->webPage = $webPage;
         $this->request = $request;
-        $this->response = $response;
+        $this->responseFactory = $responseFactory;
         $this->cache = $cache;
         $this->logger = $logger;
     }
 
     /**
      * Get configured instance of View interface, that have a render() method
+     * @param array|string|null $templatePath
+     * @param ResponseInterface|null $response
      * @return View
      */
-    public function getView(): View
+    public function getView(array|string|null $templatePath = null, ?ResponseInterface $response = null): View
     {
+
+        if ($response === null) {
+            $response = $this->responseFactory->createResponse(404);
+        }
+
+        if ($templatePath === null) {
+            $templatePath = $this->viewTopology->getTemplatePath();
+        }
 
         $smarty = new Smarty();
         $smarty->setLeftDelimiter($this->config->getLeftDelimiter());
         $smarty->setRightDelimiter($this->config->getRightDelimiter());
-        $smarty->setTemplateDir($this->viewTopology->getTemplatePath());
+        $smarty->setTemplateDir($templatePath);
         $smarty->setCompileDir($this->config->getCompiledDir());
         $smarty->setErrorReporting($this->config->getErrorReporting());
         $smarty->setPluginsDir($this->config->getPluginsDir());
@@ -65,7 +76,7 @@ class SmartyAdapter implements ViewAdapter
                 $smarty,
                 $this->webPage,
                 $this->request,
-                $this->response,
+                $response,
                 $this->cache,
                 $this->logger
         );

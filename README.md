@@ -44,8 +44,8 @@ use Psr\Http\Message\ServerRequestInterface;
         // At first we need create or have this:
         // ServerRequestInterface
         // $request = ...
-        // ResponseInterface
-        // $response = ...
+        // ResponseFactoryInterface
+        // $responseFactory = ...
         // CacheInterface
         // $cache = ...
         // LoggerInterface
@@ -102,6 +102,7 @@ use Psr\Http\Message\ServerRequestInterface;
         $viewAdapter = new SmartyAdapter($smartyConfig, $viewTopology, $webPage, $request, $response, $cache, $logger);
 
         // Get the view (Core\Interfaces\View)
+        // Also, you can overwrite here template paths and ResponseInterface
         $view = $view->getView();
 
         // Now we can use View
