@@ -13,7 +13,6 @@ use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Log\LoggerInterface;
 use \Smarty;
 
 class SmartyAdapter implements ViewAdapter
@@ -25,7 +24,6 @@ class SmartyAdapter implements ViewAdapter
     private ServerRequestInterface $request;
     private ResponseFactoryInterface $responseFactory;
     private CacheInterface $cache;
-    private LoggerInterface $logger;
 
     public function __construct(
             SmartyConfig $smartyConfig,
@@ -33,8 +31,7 @@ class SmartyAdapter implements ViewAdapter
             WebPage $webPage,
             ServerRequestInterface $request,
             ResponseFactoryInterface $responseFactory,
-            CacheInterface $cache,
-            LoggerInterface $logger
+            CacheInterface $cache
     )
     {
         $this->config = $smartyConfig;
@@ -43,7 +40,6 @@ class SmartyAdapter implements ViewAdapter
         $this->request = $request;
         $this->responseFactory = $responseFactory;
         $this->cache = $cache;
-        $this->logger = $logger;
     }
 
     /**
@@ -77,8 +73,7 @@ class SmartyAdapter implements ViewAdapter
                 $this->webPage,
                 $this->request,
                 $response,
-                $this->cache,
-                $this->logger
+                $this->cache
         );
     }
 

@@ -5,13 +5,12 @@ namespace Core\View\Smarty;
 use Core\Interfaces\View;
 use Core\Interfaces\WebPage;
 use Core\View\ViewTrait;
+use Core\View\ViewException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
-use Psr\Log\LoggerInterface;
 use \Smarty;
-use \SmartyException;
-use \Exception;
+use \Throwable;
 
 class SmartyView implements View
 {
@@ -19,7 +18,6 @@ class SmartyView implements View
     use ViewTrait;
 
     private Smarty $smarty;
-    private LoggerInterface $logger;
     private WebPage $webPage;
 
     public function __construct(
@@ -27,8 +25,7 @@ class SmartyView implements View
             WebPage $webPage,
             ServerRequestInterface $request,
             ResponseInterface $response,
-            CacheInterface $cache,
-            LoggerInterface $logger
+            CacheInterface $cache
     )
     {
         $this->smarty = $smarty;
@@ -36,7 +33,6 @@ class SmartyView implements View
         $this->request = $request;
         $this->response = $response;
         $this->cache = $cache;
-        $this->logger = $logger;
     }
 
     /**
@@ -54,8 +50,8 @@ class SmartyView implements View
             $this->smarty->assign($this->vars);
             $this->clear();
             return $rendered = $this->smarty->fetch($layout);
-        } catch (SmartyException | Exception $e) {
-            $this->logger->debug($e);
+        } catch (Throwable $e) {
+            throw new ViewException($e->getMessage());
         }
         return '';
     }
