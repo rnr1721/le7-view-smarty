@@ -6,6 +6,7 @@ use Core\Interfaces\View;
 use Core\Interfaces\WebPage;
 use Core\View\ViewTrait;
 use Core\View\ViewException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -25,7 +26,8 @@ class SmartyView implements View
             WebPage $webPage,
             ServerRequestInterface $request,
             ResponseInterface $response,
-            CacheInterface $cache
+            CacheInterface $cache,
+            EventDispatcherInterface $eventDispatcher
     )
     {
         $this->smarty = $smarty;
@@ -33,6 +35,7 @@ class SmartyView implements View
         $this->request = $request;
         $this->response = $response;
         $this->cache = $cache;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**

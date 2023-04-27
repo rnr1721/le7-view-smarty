@@ -9,6 +9,7 @@ use Core\Interfaces\ViewAdapter;
 use Core\Interfaces\WebPage;
 use Core\Interfaces\ViewTopology;
 use Core\Interfaces\SmartyConfig;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -24,6 +25,7 @@ class SmartyAdapter implements ViewAdapter
     private ServerRequestInterface $request;
     private ResponseFactoryInterface $responseFactory;
     private CacheInterface $cache;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
             SmartyConfig $smartyConfig,
@@ -31,7 +33,8 @@ class SmartyAdapter implements ViewAdapter
             WebPage $webPage,
             ServerRequestInterface $request,
             ResponseFactoryInterface $responseFactory,
-            CacheInterface $cache
+            CacheInterface $cache,
+            EventDispatcherInterface $eventDispatcher
     )
     {
         $this->config = $smartyConfig;
@@ -40,6 +43,7 @@ class SmartyAdapter implements ViewAdapter
         $this->request = $request;
         $this->responseFactory = $responseFactory;
         $this->cache = $cache;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -73,7 +77,8 @@ class SmartyAdapter implements ViewAdapter
                 $this->webPage,
                 $this->request,
                 $response,
-                $this->cache
+                $this->cache,
+                $this->eventDispatcher
         );
     }
 

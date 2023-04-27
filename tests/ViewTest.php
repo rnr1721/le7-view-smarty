@@ -8,6 +8,11 @@ use Core\View\ViewTopologyGeneric;
 use Core\Interfaces\ViewAdapter;
 use Core\View\WebPageGeneric;
 use Core\Testing\MegaFactory;
+use DI\ContainerBuilder;
+use Core\EventDispatcher\Providers\ListenerProviderDefault;
+use Core\EventDispatcher\EventDispatcher;
+use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\SimpleCache\CacheInterface;
 
 require_once 'vendor/autoload.php';
@@ -108,8 +113,9 @@ class ViewTest extends PHPUnit\Framework\TestCase
         $webPage = new WebPageGeneric($viewTopology);
         $request = $this->megaFactory->getServer()->getServerRequest('https://example.com/page/open', 'GET');
         $responseFactory = $this->megaFactory->getServer()->getResponseFactory();
-
-        return new SmartyAdapter($config, $viewTopology, $webPage, $request, $responseFactory, $cache);
+        $eventDispatcher = $this->getEventDispatcher();
+        
+        return new SmartyAdapter($config, $viewTopology, $webPage, $request, $responseFactory, $cache, $eventDispatcher);
     }
 
     public function getViewTopology(): ViewTopology
@@ -133,4 +139,17 @@ class ViewTest extends PHPUnit\Framework\TestCase
         return $smartyConfig;
     }
 
+    public function getEventDispatcher(): EventDispatcherInterface
+    {
+        $lp = new ListenerProviderDefault();
+        return new EventDispatcher($lp, $this->getContainer());
+    }
+    
+    public function getContainer(): ContainerInterface
+    {
+        $cb = new ContainerBuilder();
+        $cb->addDefinitions();
+        return $cb->build();
+    }
+    
 }
