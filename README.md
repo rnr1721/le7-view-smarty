@@ -70,8 +70,32 @@ use Psr\Http\Message\ServerRequestInterface;
                                 '/home/www/mysite/templates2'
                             ]}
         
+        // We can declare some styles if need
+        // We will can use it as single-usage or as collections
+        $styles = [
+            'bootstrap5' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'
+        ];
+
+        // And some scripts
+        $scripts = [
+            'axios' => 'https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js',
+            'jquery' => 'https://code.jquery.com/jquery-3.7.0.min.js',
+            'vuejs' => 'https://cdn.jsdelivr.net/npm/vue@2.7.8/dist/vue.js',
+            'bootstrap5' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js'
+        ];
+
+        $ac = new AssetsCollectionGeneric($scripts, $styles);
+        $ac->setScript('myscript', 'url');
+        // We can add scripts by hands, not in array
+        $ac->setStyle('mystyle', 'mystyleurl');
+        // Create new collection of assets
+        $ac->setCollection('standard', ['bootstrap5', 'jquery', 'myscript'], ['axios'], ['bootstrap5', 'mystyle']);
+
+        // After creating Assets collection we can create something like this:
+        // $webPage->applyAssetsCollection('standard') for example in controller;
+
         // WebPage object what epresents web page
-        $webPage = new WebPageGeneric($viewTopology);
+        $webPage = new WebPageGeneric($viewTopology, $ac);
         // Set style from CDN
         $webPage->setStyleCdn("https://cdn.example.com/style.css");
         // Set style from /libs

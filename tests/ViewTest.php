@@ -5,6 +5,7 @@ use Core\Interfaces\SmartyConfig;
 use Core\View\Smarty\SmartyConfigGeneric;
 use Core\Interfaces\ViewTopology;
 use Core\View\ViewTopologyGeneric;
+use Core\View\AssetsCollectionGeneric;
 use Core\Interfaces\ViewAdapter;
 use Core\View\WebPageGeneric;
 use Core\Testing\MegaFactory;
@@ -110,7 +111,9 @@ class ViewTest extends PHPUnit\Framework\TestCase
 
         $config = $this->getSmartyConfig();
         $viewTopology = $this->getViewTopology();
-        $webPage = new WebPageGeneric($viewTopology);
+        
+        $ac = new AssetsCollectionGeneric();
+        $webPage = new WebPageGeneric($viewTopology, $ac);
         $request = $this->megaFactory->getServer()->getServerRequest('https://example.com/page/open', 'GET');
         $responseFactory = $this->megaFactory->getServer()->getResponseFactory();
         $eventDispatcher = $this->getEventDispatcher();
