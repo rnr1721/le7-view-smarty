@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Core\View\Smarty;
 
-use Core\Interfaces\SmartyConfig;
+use Core\Interfaces\SmartyConfigInterface;
 
-class SmartyConfigGeneric implements SmartyConfig
+class SmartyConfigGeneric implements SmartyConfigInterface
 {
 
     private array $config = [

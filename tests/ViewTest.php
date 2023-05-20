@@ -1,12 +1,12 @@
 <?php
 
+use Core\Interfaces\ViewAdapterInterface;
+use Core\Interfaces\ViewTopologyInterface;
+use Core\Interfaces\SmartyConfigInterface;
 use Core\View\Smarty\SmartyAdapter;
-use Core\Interfaces\SmartyConfig;
 use Core\View\Smarty\SmartyConfigGeneric;
-use Core\Interfaces\ViewTopology;
 use Core\View\ViewTopologyGeneric;
 use Core\View\AssetsCollectionGeneric;
-use Core\Interfaces\ViewAdapter;
 use Core\View\WebPageGeneric;
 use Core\Testing\MegaFactory;
 use DI\ContainerBuilder;
@@ -103,7 +103,7 @@ class ViewTest extends PHPUnit\Framework\TestCase
         $this->assertEquals('value1value2https://example.com/jshttps://example.com/theme', (string) $response->getBody());
     }
 
-    public function getSmartyAdapter(CacheInterface $cache = null): ViewAdapter
+    public function getSmartyAdapter(CacheInterface $cache = null): ViewAdapterInterface
     {
         if (empty($cache)) {
             $cache = $this->megaFactory->getCache()->getFileCache();
@@ -111,17 +111,17 @@ class ViewTest extends PHPUnit\Framework\TestCase
 
         $config = $this->getSmartyConfig();
         $viewTopology = $this->getViewTopology();
-        
+
         $ac = new AssetsCollectionGeneric();
         $webPage = new WebPageGeneric($viewTopology, $ac);
         $request = $this->megaFactory->getServer()->getServerRequest('https://example.com/page/open', 'GET');
         $responseFactory = $this->megaFactory->getServer()->getResponseFactory();
         $eventDispatcher = $this->getEventDispatcher();
-        
+
         return new SmartyAdapter($config, $viewTopology, $webPage, $request, $responseFactory, $cache, $eventDispatcher);
     }
 
-    public function getViewTopology(): ViewTopology
+    public function getViewTopology(): ViewTopologyInterface
     {
         $viewTopology = new ViewTopologyGeneric();
         $viewTopology->setBaseUrl('https://example.com')
@@ -135,7 +135,7 @@ class ViewTest extends PHPUnit\Framework\TestCase
         return $viewTopology;
     }
 
-    public function getSmartyConfig(): SmartyConfig
+    public function getSmartyConfig(): SmartyConfigInterface
     {
         $smartyConfig = new SmartyConfigGeneric();
         $smartyConfig->setCompiledDir($this->compiledDirectory);
@@ -147,12 +147,12 @@ class ViewTest extends PHPUnit\Framework\TestCase
         $lp = new ListenerProviderDefault();
         return new EventDispatcher($lp, $this->getContainer());
     }
-    
+
     public function getContainer(): ContainerInterface
     {
         $cb = new ContainerBuilder();
         $cb->addDefinitions();
         return $cb->build();
     }
-    
+
 }

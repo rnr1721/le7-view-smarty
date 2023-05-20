@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Core\View\Smarty;
 
-use Core\Interfaces\View;
-use Core\Interfaces\ViewAdapter;
-use Core\Interfaces\WebPage;
-use Core\Interfaces\ViewTopology;
-use Core\Interfaces\SmartyConfig;
+use Core\Interfaces\ViewInterface;
+use Core\Interfaces\ViewAdapterInterface;
+use Core\Interfaces\WebPageInterface;
+use Core\Interfaces\ViewTopologyInterface;
+use Core\Interfaces\SmartyConfigInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,21 +16,21 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use \Smarty;
 
-class SmartyAdapter implements ViewAdapter
+class SmartyAdapter implements ViewAdapterInterface
 {
 
-    private SmartyConfig $config;
-    private ViewTopology $viewTopology;
-    private WebPage $webPage;
+    private SmartyConfigInterface $config;
+    private ViewTopologyInterface $viewTopology;
+    private WebPageInterface $webPage;
     private ServerRequestInterface $request;
     private ResponseFactoryInterface $responseFactory;
     private CacheInterface $cache;
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-            SmartyConfig $smartyConfig,
-            ViewTopology $viewTopology,
-            WebPage $webPage,
+            SmartyConfigInterface $smartyConfig,
+            ViewTopologyInterface $viewTopology,
+            WebPageInterface $webPage,
             ServerRequestInterface $request,
             ResponseFactoryInterface $responseFactory,
             CacheInterface $cache,
@@ -50,9 +50,9 @@ class SmartyAdapter implements ViewAdapter
      * Get configured instance of View interface, that have a render() method
      * @param array|string|null $templatePath
      * @param ResponseInterface|null $response
-     * @return View
+     * @return ViewInterface
      */
-    public function getView(array|string|null $templatePath = null, ?ResponseInterface $response = null): View
+    public function getView(array|string|null $templatePath = null, ?ResponseInterface $response = null): ViewInterface
     {
 
         if ($response === null) {

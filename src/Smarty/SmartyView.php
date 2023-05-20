@@ -2,8 +2,8 @@
 
 namespace Core\View\Smarty;
 
-use Core\Interfaces\View;
-use Core\Interfaces\WebPage;
+use Core\Interfaces\ViewInterface;
+use Core\Interfaces\WebPageInterface;
 use Core\View\ViewTrait;
 use Core\View\ViewException;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -13,17 +13,17 @@ use Psr\SimpleCache\CacheInterface;
 use \Smarty;
 use \Throwable;
 
-class SmartyView implements View
+class SmartyView implements ViewInterface
 {
 
     use ViewTrait;
 
     private Smarty $smarty;
-    private WebPage $webPage;
+    private WebPageInterface $webPage;
 
     public function __construct(
             Smarty $smarty,
-            WebPage $webPage,
+            WebPageInterface $webPage,
             ServerRequestInterface $request,
             ResponseInterface $response,
             CacheInterface $cache,

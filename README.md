@@ -25,9 +25,9 @@ composer test
 ## How it works?
 
 ```php
-use Core\Interfaces\ViewTopology;
-use Core\Interfaces\ViewAdapter;
-use Core\Interfaces\SmartyConfig;
+use Core\Interfaces\ViewTopologyInterface;
+use Core\Interfaces\ViewAdapterInterface;
+use Core\Interfaces\SmartyConfigInterface;
 
 use Core\View\WebPageGeneric;
 use Core\View\ViewTopologyGeneric;
@@ -122,10 +122,10 @@ use Psr\Http\Message\ServerRequestInterface;
         // {$scripts_header}, {$scripts_footer}, {$styles}, {importmap}
         // {$title}, {$keywords}, {$header}, {$description} etc...
 
-        // Get the Smarty adapter (Core\Interfaces\ViewAdapter)
+        // Get the Smarty adapter (Core\Interfaces\ViewAdapterInterface)
         $viewAdapter = new SmartyAdapter($smartyConfig, $viewTopology, $webPage, $request, $response, $cache, $logger);
 
-        // Get the view (Core\Interfaces\View)
+        // Get the view (Core\Interfaces\ViewInterface)
         // Also, you can overwrite here template paths and ResponseInterface
         $view = $view->getView();
 
