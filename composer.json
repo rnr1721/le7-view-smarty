@@ -38,7 +38,7 @@
         "php-di/php-di": "^7.0",
         "rnr1721/le7-event-manager": "^1.0"
     },
-    "conflict": {
+    "replace": {
         "rnr1721/le7-view-twig": "*"
     },
     "scripts": {
