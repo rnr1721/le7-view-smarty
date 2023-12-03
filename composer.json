@@ -39,7 +39,6 @@
         "rnr1721/le7-event-manager": "^1.0"
     },
     "conflict": {
-        "rnr1721/le7-view-php": "*",
         "rnr1721/le7-view-twig": "*"
     },
     "scripts": {
