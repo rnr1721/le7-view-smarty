@@ -43,6 +43,7 @@ class ViewTest extends PHPUnit\Framework\TestCase
             'compiledDir' => '',
             'errorReporting' => E_ALL,
             'plugins' => [],
+            'registered_plugins' => []
         ];
 
         $config = new SmartyConfigGeneric();
@@ -54,12 +55,21 @@ class ViewTest extends PHPUnit\Framework\TestCase
         $config->setErrorReporting(E_ALL);
         $config->setPluginsDir('.');
         $config->setPluginsDir('..');
+        $config->registerPlugin('modifier', '_', '_');
 
         $this->assertEquals('.', $config->getCompiledDir());
         $this->assertEquals('[[', $config->getLeftDelimiter());
         $this->assertEquals(']]', $config->getRightDelimiter());
         $this->assertEquals(E_ALL, $config->getErrorReporting());
         $this->assertEquals(['.', '..'], $config->getPluginsDir());
+        $this->assertEquals([
+            [
+                'type' => 'modifier',
+                'name' => '_',
+                'callback' => '_',
+                'cacheable' => true
+            ]
+                ], $config->getRegisteredPlugins());
     }
 
     public function testSmarty()
@@ -154,5 +164,4 @@ class ViewTest extends PHPUnit\Framework\TestCase
         $cb->addDefinitions();
         return $cb->build();
     }
-
 }

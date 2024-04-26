@@ -37,6 +37,22 @@ interface SmartyConfigInterface
     public function setPluginsDir(string|array $dir): self;
 
     /**
+     * Register plugin in smarty
+     * 
+     * @param string $type Type of smarty plugin
+     * @param string $name Name of plugin
+     * @param callable $callback Plugin code
+     * @param bool $cacheable
+     * @return self
+     */
+    public function registerPlugin(
+            string $type,
+            string $name,
+            $callback,
+            bool $cacheable = true
+    ): self;
+
+    /**
      * Get config as single array
      * @return array
      */
@@ -65,10 +81,17 @@ interface SmartyConfigInterface
      * @return int
      */
     public function getErrorReporting(): int;
-    
+
     /**
      * Get application plugins directory
      * @return array
      */
     public function getPluginsDir(): array;
+
+    /**
+     * Get all registered plugins
+     * 
+     * @return array All registered plugins
+     */
+    public function getRegisteredPlugins(): array;
 }

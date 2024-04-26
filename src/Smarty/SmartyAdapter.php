@@ -70,6 +70,16 @@ class SmartyAdapter implements ViewAdapterInterface
         $smarty->setCompileDir($this->config->getCompiledDir());
         $smarty->setErrorReporting($this->config->getErrorReporting());
         $smarty->setPluginsDir($this->config->getPluginsDir());
+
+        $registeredPlugins = $this->config->getRegisteredPlugins();
+        foreach ($registeredPlugins as $registeredPlugin) {
+            $smarty->registerPlugin(
+                    $registeredPlugin['type'],
+                    $registeredPlugin['name'],
+                    $registeredPlugin['callback'],
+                    $registeredPlugin['cacheable']
+            );
+        }
         // It will be not native smarty cache
         $smarty->setCaching(0);
         return new SmartyView(
@@ -81,5 +91,4 @@ class SmartyAdapter implements ViewAdapterInterface
                 $this->eventDispatcher
         );
     }
-
 }

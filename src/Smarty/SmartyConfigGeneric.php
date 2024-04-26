@@ -14,7 +14,8 @@ class SmartyConfigGeneric implements SmartyConfigInterface
         'rightDelimiter' => '}',
         'compiledDir' => '',
         'errorReporting' => E_ALL,
-        'plugins' => []
+        'plugins' => [],
+        'registered_plugins' => []
     ];
 
     public function setDelimiters(string $left, string $right): self
@@ -53,6 +54,22 @@ class SmartyConfigGeneric implements SmartyConfigInterface
         $this->config['plugins'][] = $dir;
     }
 
+    public function registerPlugin(
+            string $type,
+            string $name,
+            $callback,
+            bool $cacheable = true
+    ): self
+    {
+        $this->config['registered_plugins'][] = [
+            'type' => $type,
+            'name' => $name,
+            'callback' => $callback,
+            'cacheable' => $cacheable
+        ];
+        return $this;
+    }
+
     public function getConfig(): array
     {
         return $this->config;
@@ -83,4 +100,8 @@ class SmartyConfigGeneric implements SmartyConfigInterface
         return $this->config['plugins'];
     }
 
+    public function getRegisteredPlugins(): array
+    {
+        return $this->config['registered_plugins'];
+    }
 }
